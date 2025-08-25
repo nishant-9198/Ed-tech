@@ -16,32 +16,37 @@ const dotenv = require("dotenv");
 const PORT = process.env.PORT || 4000;
 //connecting to database
 
-// connecting to database
 database.dbConnect();
 
-// adding middleware
+// ✅ middleware
 app.use(express.json());
 app.use(cookieParser());
 
-// ✅ Allow-list based CORS setup
+// ✅ Allowed origins
 const allowedOrigins = [
-  "http://localhost:3000",             // local frontend
-  "https://ed-tech-olive.vercel.app"   // deployed frontend
+  "http://localhost:3000",            // local frontend
+  "https://ed-tech-olive.vercel.app"  // main deployed frontend
 ];
 
+// ✅ Regex for all vercel subdomains
+const vercelRegex = /^https:\/\/.*\.vercel\.app$/;
+
+// ✅ Global CORS setup
 app.use(
   cors({
     origin: function (origin, callback) {
       // Allow requests with no origin (Postman, curl, mobile apps, etc.)
       if (!origin) return callback(null, true);
 
-      if (allowedOrigins.includes(origin)) {
+      if (allowedOrigins.includes(origin) || vercelRegex.test(origin)) {
         callback(null, true);
       } else {
-        console.warn(` CORS blocked request from origin: ${origin}`);
+        console.warn(`❌ CORS blocked request from origin: ${origin}`);
         callback(new Error("Not allowed by CORS"));
       }
     },
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // allowed methods
+    allowedHeaders: ["Content-Type", "Authorization"],             // allowed headers
     credentials: true,
   })
 );
