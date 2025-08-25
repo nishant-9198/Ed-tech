@@ -15,18 +15,37 @@ const dotenv = require("dotenv");
 
 const PORT = process.env.PORT || 4000;
 //connecting to database
+
+// connecting to database
 database.dbConnect();
+
 // adding middleware
 app.use(express.json());
 app.use(cookieParser());
+
+// ✅ Allow-list based CORS setup
+const allowedOrigins = [
+  "http://localhost:3000",             // local frontend
+  "https://ed-tech-olive.vercel.app"   // deployed frontend
+];
+
 app.use(
-    cors(
-        {   // request from frontend that should be entertain
-            origin:"http://localhost:3000",
-            credentials:true,
-        }
-    )
-)
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (Postman, curl, mobile apps, etc.)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.warn(` CORS blocked request from origin: ${origin}`);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
 
 //file upload
 app.use(
