@@ -42,7 +42,7 @@ pids
 *.pid.lock
 
 # ------------------------
-# Coverage
+# Coverage 
 # ------------------------
 coverage/
 client/coverage/
